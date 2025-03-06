@@ -31,6 +31,9 @@ jobs:
           pip install pytest pytest-cov
           pytest --cov=my_project --cov-report=xml
 
+      - name: Verify coverage file exists
+        run: ls -lah coverage.xml  # Debug step to check if coverage.xml is generated
+
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
         with:
