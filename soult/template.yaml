@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: soult
+
+Globals:
+  Function:
+    Timeout: 500
+
+Resources:
+  UserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Environment:
+        Variables:
+          TZ: Asia/Kolkata
+      CodeUri: .
+      Handler: lambda.app.lambda_handler
+      Runtime: python3.12
+      Architectures:
+        - x86_64
+      Policies:
+        - AWSLambdaBasicExecutionRole
+        - Statement:
+            Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:PutItem
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:Query
+            Resource:
+              - arn:aws:dynamodb:ap-south-1:127214196952:table/user
+              - arn:aws:dynamodb:ap-south-1:127214196952:table/user/index/phone-no-index
+              - arn:aws:dynamodb:ap-south-1:127214196952:table/user/index/email-index
+              - arn:aws:dynamodb:ap-south-1:127214196952:table/audit
+        - Statement:
+            Effect: Allow
+            Action:
+              - sns:Publish
+            Resource:
+              - arn:aws:sns:ap-south-1:127214196952:soult-events
+        - Statement:
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+            Resource:
+              - arn:aws:s3:::soult-docs/*
+        - Statement:
+            Effect: Allow
+            Action:
+              - ses:SendEmail
+            Resource:
+              - arn:aws:ses:ap-south-1:127214196952:identity/*
+      Events:
+        UserAPI:
+          Type: Api
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  UserFunctionApi:
+    Description: "API Gateway endpoint URL for Prod stage"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  UserFunction:
+    Description: "Lambda Function ARN"
+    Value: !GetAtt UserFunction.Arn
+  UserFunctionIamRole:
+    Description: "IAM Role for the function"
+    Value: !GetAtt UserFunctionRole.Arn
