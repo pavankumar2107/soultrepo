@@ -3,6 +3,7 @@ import logging
 
 app = FastAPI()
 
+
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
