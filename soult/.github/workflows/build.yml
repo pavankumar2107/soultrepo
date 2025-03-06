@@ -10,7 +10,7 @@ on:
       - main
 
 jobs:
-  sonarqube:
+  sonarcloud:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -25,17 +25,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          
+
       - name: Run tests with coverage
         run: |
           pip install pytest pytest-cov
           pytest --cov=my_project --cov-report=xml
 
-      
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: Verify coverage file exists
+        run: ls -lah coverage.xml  # Debug step to check if coverage.xml is generated
 
       - name: SonarCloud Scan
         uses: SonarSource/sonarcloud-github-action@v2
