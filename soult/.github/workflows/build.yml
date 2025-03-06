@@ -1,4 +1,4 @@
-name: SonarCloud Analysis
+name: SonarCloud Analysis with Coverage
 
 on:
   workflow_dispatch:
@@ -28,24 +28,29 @@ jobs:
 
       - name: Run tests with coverage
         run: |
-          pytest --cov=my_project --cov-report=xml
+          pytest --cov=my_project --cov-report=xml --cov-report=html
 
-      - name: Verify coverage file exists
+      - name: Verify coverage reports
         run: |
           ls -lah coverage.xml
-          cat coverage.xml  # Debug step to check content
+          cat coverage.xml  # Debugging step
+
+      - name: Set up SonarScanner CLI
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner.zip
+          export PATH=$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH
+          sonar-scanner --version  # Verify installation
 
       - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@v2
-        with:
-          projectBaseDir: .
-          args: >
-            -Dsonar.organization=soult
-            -Dsonar.projectKey=pavankumar2107_soultrepo
-            -Dsonar.host.url=https://sonarcloud.io
-            -Dsonar.python.version=3.10
-            -Dsonar.sources=.
-            -Dsonar.coverage.exclusions=tests/**
-            -Dsonar.python.coverage.reportPaths=coverage.xml
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -Dsonar.organization=soult \
+            -Dsonar.projectKey=pavankumar2107_soultrepo \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.sources=. \
+            -Dsonar.python.version=3.10 \
+            -Dsonar.coverage.exclusions=tests/** \
+            -Dsonar.python.coverage.reportPaths=coverage.xml
