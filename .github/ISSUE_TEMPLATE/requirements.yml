@@ -1,1 +1,47 @@
-
+name: Requirements
+description: Submit a new requirements issue for the project
+title: "[Requirements] <title>"
+labels: ["requirements", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Requirements"
+  - type: dropdown
+    id: requirement-type
+    attributes:
+      label: Requirement Type
+      description: Select the type of requirement.
+      options:
+        - Feature
+        - Bug Fix
+        - Enhancement
+        - Documentation
+      default: 0
+      validations:
+        required: true
+  - type: checkboxes
+    id: requirement-details
+    attributes:
+      label: Requirement Details
+      description: Check all applicable requirements.
+      options:
+        - label: User Interface Update
+          required: false
+        - label: Backend Logic
+          required: false
+        - label: Database Changes
+          required: false
+        - label: Performance Optimization
+          required: false
+        - label: Security Compliance
+          required: false
+    validations:
+      required: true
+  - type: textarea
+    id: additional-details
+    attributes:
+      label: Additional Details
+      description: Provide any additional context or details for the requirements.
+      placeholder: Describe the requirements in detail...
+    validations:
+      required: false
