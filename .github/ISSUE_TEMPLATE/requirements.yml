@@ -1,11 +1,45 @@
-name: "Bug report"
-description: "Thank you for reporting a bug!"
+name: Campaign Request
+description: Submit a new marketing campaign for the funnel
+labels: [campaign-request]
+title: "[Campaign] <Client> — <Short Title>"
+projects: ["<owner>/<project_number>"] # optional; you can rely on Auto-add instead
 body:
 - type: input
-  id: prevalence
-  attributes:
-    label: Bug prevalence
-    description: "How often do you or others encounter this bug?"
-    placeholder: "Whenever I visit the user account page (1-2 times a week)"
-  validations:
-    required: true
+id: client
+attributes:
+label: Client name
+placeholder: ACME Corp
+validations:
+required: true
+- type: dropdown
+id: campaign_type
+attributes:
+label: Campaign type
+options: [Post, Reel, Story, Carousel, Ad]
+validations:
+required: true
+- type: textarea
+id: objectives
+attributes:
+label: Objectives & KPIs
+description: What are we trying to achieve? Add success metrics.
+placeholder: Increase followers by 5%, reach 50k impressions, CTR > 2%
+- type: textarea
+id: requirements
+attributes:
+label: Requirements / Brief
+description: Include audience, tone, references, mandatory hashtags/handles, brand assets.
+- type: input
+id: due
+attributes:
+label: Target publish date
+placeholder: YYYY-MM-DD
+- type: textarea
+id: assets
+attributes:
+label: Existing assets/links
+placeholder: Drive links, previous posts, mood boards
+- type: textarea
+id: approvals
+attributes:
+label: Approval contacts
