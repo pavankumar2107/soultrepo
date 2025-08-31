@@ -1,27 +1,56 @@
-name: Build
+name: SonarCloud Analysis with Coverage
+
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
 jobs:
-  sonarqube:
-    name: SonarQube Cloud
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - name: Setup Python
-        uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python }}
-      - name: Install tox and any other packages
-        run: pip install tox
-      - name: Run tox
-        run: tox -e py
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@v4
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  sonarcloud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pytest pytest-cov
+
+      - name: Run tests with coverage
+        run: |
+          pytest --cov=my_project --cov-report=xml --cov-report=html
+
+      - name: Verify coverage reports
+        run: |
+          ls -lah coverage.xml
+          cat coverage.xml  # Debugging step
+
+      - name: Set up SonarScanner CLI
+        run: |
+          curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip
+          unzip sonar-scanner.zip
+          export PATH=$PWD/sonar-scanner-5.0.1.3006-linux/bin:$PATH
+          sonar-scanner --version  # Verify installation
+
+      - name: SonarCloud Scan
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: |
+          sonar-scanner \
+            -Dsonar.organization=soult \
+            -Dsonar.projectKey=pavankumar2107_soultrepo \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.sources=. \
+            -Dsonar.python.version=3.10 \
+            -Dsonar.coverage.exclusions=tests/** \
+            -Dsonar.python.coverage.reportPaths=coverage.xml
